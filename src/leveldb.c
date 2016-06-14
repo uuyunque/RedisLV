@@ -8,7 +8,7 @@
 
 void procLeveldbError(char* err, const char* fmt) {
   if (err != NULL) {
-    redisLog(REDIS_WARNING, fmt, err);
+    redisLog(REDIS_WARNING, "%s: %s", fmt, err);
     leveldb_free(err);
     exit(1);
   }
@@ -24,7 +24,7 @@ void initleveldb(struct leveldb* ldb, char *path) {
   char *err = NULL;
   ldb->db = leveldb_open(ldb->options, path, &err);
 
-  procLeveldbError(err, "open leveldb err: %s");
+  procLeveldbError(err, "open leveldb error");
 
   ldb->roptions = leveldb_readoptions_create();
   leveldb_readoptions_set_fill_cache(ldb->roptions, 0);
@@ -391,7 +391,7 @@ void leveldbSetDirect(int dbid, struct leveldb *ldb, robj *argv1, robj *argv2) {
   char *err = NULL;
 
   leveldb_put(ldb->db, ldb->woptions, key, sdslen(key), r2->ptr, sdslen(r2->ptr), &err);
-  procLeveldbError(err, "set direct leveldb err: %s");
+  procLeveldbError(err, "set direct leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -409,7 +409,7 @@ void leveldbDelString(int dbid, struct leveldb *ldb, robj* argv) {
   char *err = NULL;
 
   leveldb_delete(ldb->db, ldb->woptions, sdskey, sdslen(sdskey), &err);
-  procLeveldbError(err, "leveldbDel leveldb err: %s");
+  procLeveldbError(err, "leveldbDel leveldb error");
   server.leveldb_op_num++;
   
   sdsfree(sdskey);
@@ -447,7 +447,7 @@ void leveldbHsetDirect(int dbid, struct leveldb *ldb, robj *argv1, robj *argv2, 
 
   key = sdscatsds(key, r2->ptr);
   leveldb_put(ldb->db, ldb->woptions, key, sdslen(key), r3->ptr, sdslen(r3->ptr), &err);
-  procLeveldbError(err, "hset direct leveldb err: %s");
+  procLeveldbError(err, "hset direct leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -478,7 +478,7 @@ void leveldbHmset(int dbid, struct leveldb *ldb, robj** argv, int argc) {
     j += 2;
   }
   leveldb_write(ldb->db, ldb->woptions, wb, &err);
-  procLeveldbError(err, "hmset leveldb err: %s");
+  procLeveldbError(err, "hmset leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -511,7 +511,7 @@ void leveldbHdel(int dbid, struct leveldb *ldb, robj** argv, int argc) {
     j++;
   }
   leveldb_write(ldb->db, ldb->woptions, wb, &err);
-  procLeveldbError(err, "hdel leveldb err: %s");
+  procLeveldbError(err, "hdel leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -546,14 +546,14 @@ void leveldbHclear(int dbid, struct leveldb *ldb, robj *argv) {
     cmp = memcmp(r1->ptr, data + LEVELDB_KEY_FLAG_SET_KEY, len);
     if(cmp != 0) break;
     leveldb_delete(ldb->db, ldb->woptions, data, dataLen, &err);
-    procLeveldbError(err, "hclear leveldb err: %s");
+    procLeveldbError(err, "hclear leveldb error");
   }
   server.leveldb_op_num++;
 
   sdsfree(key);
   decrRefCount(r1);
   leveldb_iter_get_error(iterator, &err);
-  procLeveldbError(err, "hclear leveldb iterator err: %s");
+  procLeveldbError(err, "hclear leveldb iterator error");
   leveldb_iter_destroy(iterator);
 }
 
@@ -592,7 +592,7 @@ void leveldbSadd(int dbid, struct leveldb *ldb, robj** argv, int argc) {
     j++;
   }
   leveldb_write(ldb->db, ldb->woptions, wb, &err);
-  procLeveldbError(err, "sadd leveldb err: %s");
+  procLeveldbError(err, "sadd leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -625,7 +625,7 @@ void leveldbSrem(int dbid, struct leveldb *ldb, robj** argv, int argc) {
     j++;
   }
   leveldb_write(ldb->db, ldb->woptions, wb, &err);
-  procLeveldbError(err, "srem leveldb err: %s");
+  procLeveldbError(err, "srem leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -660,14 +660,14 @@ void leveldbSclear(int dbid, struct leveldb *ldb, robj* argv) {
     cmp = memcmp(r1->ptr, data + LEVELDB_KEY_FLAG_SET_KEY, len);
     if(cmp != 0) break;
     leveldb_delete(ldb->db, ldb->woptions, data, dataLen, &err);
-    procLeveldbError(err, "sclear leveldb err: %s");
+    procLeveldbError(err, "sclear leveldb error");
   }
   server.leveldb_op_num++;
 
   sdsfree(key);
   decrRefCount(r1);
   leveldb_iter_get_error(iterator, &err);
-  procLeveldbError(err, "sclear leveldb iterator err: %s");
+  procLeveldbError(err, "sclear leveldb iterator error");
   leveldb_iter_destroy(iterator);
 }
 
@@ -707,7 +707,7 @@ void leveldbZadd(int dbid, struct leveldb *ldb, robj** argv, int argc) {
     j += 2;
   }
   leveldb_write(ldb->db, ldb->woptions, wb, &err);
-  procLeveldbError(err, "zadd leveldb err: %s");
+  procLeveldbError(err, "zadd leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -734,7 +734,7 @@ void leveldbZaddDirect(int dbid, struct leveldb *ldb, robj* argv1, robj* argv2, 
   int len = snprintf(buf,sizeof(buf),"%.17g",score);
 
   leveldb_put(ldb->db, ldb->woptions, key, klen, buf, len, &err);
-  procLeveldbError(err, "zadd direct leveldb err: %s");
+  procLeveldbError(err, "zadd direct leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -763,7 +763,7 @@ void leveldbZrem(int dbid, struct leveldb *ldb, robj** argv, int argc) {
     j++;
   }
   leveldb_write(ldb->db, ldb->woptions, wb, &err);
-  procLeveldbError(err, "zrem leveldb err: %s");
+  procLeveldbError(err, "zrem leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -790,7 +790,7 @@ void leveldbZremByLongLong(int dbid, struct leveldb *ldb, robj *arg, long long v
   key = sdscatlen(key, buf, len);
   //redisLog(REDIS_NOTICE, "leveldbZremByLongLong %s", key);
   leveldb_delete(ldb->db, ldb->woptions, key, sdslen(key), &err);
-  procLeveldbError(err, "zrem by long long leveldb err: %s");
+  procLeveldbError(err, "zrem by long long leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -809,7 +809,7 @@ void leveldbZremByCBuffer(int dbid, struct leveldb *ldb, robj *arg, unsigned cha
   key = sdscatlen(key, vstr, vlen);
   //redisLog(REDIS_NOTICE, "leveldbZremByCBuffer %s", key);
   leveldb_delete(ldb->db, ldb->woptions, key, sdslen(key), &err);
-  procLeveldbError(err, "zrem by c buffer leveldb err: %s");
+  procLeveldbError(err, "zrem by c buffer leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -829,7 +829,7 @@ void leveldbZremByObject(int dbid, struct leveldb *ldb, robj *arg, robj *field) 
   key = sdscatsds(key,  r2->ptr);
   //redisLog(REDIS_NOTICE, "leveldbZremByObject %s", key);
   leveldb_delete(ldb->db, ldb->woptions, key, sdslen(key), &err);
-  procLeveldbError(err, "zrem by object leveldb err: %s");
+  procLeveldbError(err, "zrem by object leveldb error");
   server.leveldb_op_num++;
 
   sdsfree(key);
@@ -860,14 +860,14 @@ void leveldbZclear(int dbid, struct leveldb *ldb, robj* argv) {
     cmp = memcmp(r1->ptr, data + LEVELDB_KEY_FLAG_SET_KEY, len);
     if(cmp != 0) break;
     leveldb_delete(ldb->db, ldb->woptions, data, dataLen, &err);
-    procLeveldbError(err, "zclear leveldb err: %s");
+    procLeveldbError(err, "zclear leveldb error");
   }
   server.leveldb_op_num++;
 
   sdsfree(key);
   decrRefCount(r1);
   leveldb_iter_get_error(iterator, &err);
-  procLeveldbError(err, "zclear leveldb iterator err: %s");
+  procLeveldbError(err, "zclear leveldb iterator error");
   leveldb_iter_destroy(iterator);
 }
 
@@ -883,12 +883,12 @@ void leveldbFlushdb(int dbid, struct leveldb* ldb) {
     data = (char*) leveldb_iter_key(iterator, &dataLen);
     if(data[LEVELDB_KEY_FLAG_DATABASE_ID] != dbid) break;
     leveldb_delete(ldb->db, ldb->woptions, data, dataLen, &err);
-    procLeveldbError(err, "flushdb leveldb err: %s");
+    procLeveldbError(err, "flushdb leveldb error");
   }
   server.leveldb_op_num++;
 
   leveldb_iter_get_error(iterator, &err);
-  procLeveldbError(err, "flushdb leveldb iterator err: %s");
+  procLeveldbError(err, "flushdb leveldb iterator error");
   leveldb_iter_destroy(iterator);
 }
 
@@ -901,12 +901,12 @@ void leveldbFlushall(struct leveldb* ldb) {
   for(leveldb_iter_seek_to_first(iterator); leveldb_iter_valid(iterator); leveldb_iter_next(iterator)) {
     data = (char*) leveldb_iter_key(iterator, &dataLen);
     leveldb_delete(ldb->db, ldb->woptions, data, dataLen, &err);
-    procLeveldbError(err, "flushall leveldb err: %s");
+    procLeveldbError(err, "flushall leveldb error");
   }
   server.leveldb_op_num++;
 
   leveldb_iter_get_error(iterator, &err);
-  procLeveldbError(err, "flushall leveldb iterator err: %s");
+  procLeveldbError(err, "flushall leveldb iterator error");
   leveldb_iter_destroy(iterator);
 }
 
@@ -1178,7 +1178,7 @@ void leveldbDelHash(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
     }
 
     leveldb_write(ldb->db, ldb->woptions, wb, &err);
-    procLeveldbError(err, "leveldbDelHash leveldb err: %s");
+    procLeveldbError(err, "leveldbDelHash leveldb error");
     server.leveldb_op_num++;
 
     hashTypeReleaseIterator(hi);
@@ -1214,7 +1214,7 @@ void leveldbDelSet(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
     }
     
     leveldb_write(ldb->db, ldb->woptions, wb, &err);
-    procLeveldbError(err, "leveldbDelSet leveldb err: %s");
+    procLeveldbError(err, "leveldbDelSet leveldb error");
     server.leveldb_op_num++;
     
     setTypeReleaseIterator(si);
@@ -1283,7 +1283,7 @@ void leveldbDelZset(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
     }
     
     leveldb_write(ldb->db, ldb->woptions, wb, &err);
-    procLeveldbError(err, "leveldbDelZset leveldb err: %s");
+    procLeveldbError(err, "leveldbDelZset leveldb error");
     server.leveldb_op_num++;
 
     leveldb_writebatch_destroy(wb);
