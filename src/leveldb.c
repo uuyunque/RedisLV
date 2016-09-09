@@ -268,6 +268,7 @@ int meltKey(int dbid, struct leveldb *ldb, robj *key, char keytype) {
         redisLog(REDIS_WARNING, "meltKey iterator err: %s", err);
         leveldb_free(err);
         err = NULL;
+        success = 0;
     }
 
     leveldb_iter_destroy(iterator);
@@ -346,6 +347,7 @@ int loadleveldb(char *path) {
     redisLog(REDIS_WARNING, "load leveldb iterator err: %s", err);
     leveldb_free(err);
     err = NULL;
+    success = 0;
   }
 
   leveldb_iter_destroy(iterator);
