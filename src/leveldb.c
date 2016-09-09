@@ -264,12 +264,7 @@ int meltKey(int dbid, struct leveldb *ldb, robj *key, char keytype) {
     sdsfree(sdskey);
     
     leveldb_iter_get_error(iterator, &err);
-    if(err != NULL) {
-        redisLog(REDIS_WARNING, "meltKey iterator err: %s", err);
-        leveldb_free(err);
-        err = NULL;
-        success = 0;
-    }
+    procLeveldbError(err, "meltKey iterator err");
 
     leveldb_iter_destroy(iterator);
     if(success == 1) {
