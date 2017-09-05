@@ -2,7 +2,6 @@
 ---
 
 ### Redis持久化的问题
----
 1. RDB方式: 数据持久化的过程中可能存在大量额外内存消耗。
 2. AOF方式: 通过aof文件恢复数据库的过程慢。
 
@@ -20,7 +19,6 @@ redis-cli backup dir(备份文件目录)
 * 当备份目录中包含BACKUP.log文件并且文件中有SUCCESS字段，表示备份成功
 
 ### Redis命令支持状况(yes: 支持; no: 不支持)
----
 
 | Key         |     |
 |-------------|-----|
@@ -45,6 +43,8 @@ redis-cli backup dir(备份文件目录)
 | TTL         | no  |
 | TYPE        | yes |
 | SCAN        | yes |
+
+---
 
 | String      |     |
 |-------------|-----|
@@ -71,6 +71,8 @@ redis-cli backup dir(备份文件目录)
 | SETRANGE    | yes |
 | STRLEN      | yes |
 
+---
+
 | Hash        |     |
 |-------------|-----|
 | HDEL        | yes | 
@@ -87,6 +89,8 @@ redis-cli backup dir(备份文件目录)
 | HSETNX      | yes |
 | HVALS       | yes |
 | HSCAN       | yes |
+
+---
 
 | Set         |     |
 |-------------|-----|
@@ -105,6 +109,8 @@ redis-cli backup dir(备份文件目录)
 | SUNION      | yes |
 | SUNIONSTORE | no  |
 | SSCAN       | yes |
+
+---
 
 | SortedSet       |     |
 |-----------------|-----|
