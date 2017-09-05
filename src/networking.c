@@ -581,7 +581,7 @@ void acceptTcpHandler(aeEventLoop *el, int fd, void *privdata, int mask) {
                     "Accepting client connection: %s", server.neterr);
             return;
         }
-        redisLog(REDIS_VERBOSE,"Accepted %s:%d", cip, cport);
+        redisLog(REDIS_NOTICE,"Accepted %s:%d", cip, cport);
         acceptCommonHandler(cfd,0);
     }
 }
