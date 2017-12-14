@@ -25,6 +25,10 @@ You can run a 32 bit Redis binary using:
 After building Redis is a good idea to test it, using:
 
     % make test
+if storing data in file with leveldb ,using 
+    % make test_ldb
+
+it's default test case, if running make test, please del leveldb config from test/assset/default.conf
 
 Fixing problems building 32 bit binaries
 ---------

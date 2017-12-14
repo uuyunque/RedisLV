@@ -49,6 +49,7 @@ set ::all_tests {
     unit/memefficiency
     unit/hyperloglog
 }
+# unit/memefficiency cost long time more than 300 seconds
 # Index to the next test to run in the ::all_tests list.
 set ::next_test 0
 

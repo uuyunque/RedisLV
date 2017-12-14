@@ -33,33 +33,6 @@ set ::all_tests {
   unit/bitops
   unit/hyperloglog
 }
-
-#set ::all_tests {
-#  unit/printver
-#  unit/auth
-#  unit/protocol
-#  unit/basic
-#  unit/type/list
-#  unit/type/list-2
-#  unit/type/list-3
-#  unit/type/set
-#  unit/type/zset
-#  unit/type/hash
-#  unit/other
-#  unit/multi
-#  unit/quit
-#  unit/pubsub
-#  unit/slowlog
-#  unit/maxmemory
-#  unit/introspection
-#  unit/limits
-#  unit/obuf-limits
-#  unit/bitops
-#  unit/memefficiency  ;#跳不出来了
-#  unit/hyperloglog
-#}
-
-
 #Index to the next test to run in the ::all_tests list.
 set ::next_test 0
 
@@ -182,8 +155,8 @@ proc s {args} {
 proc cleanup {} {
     if {!$::quiet} {puts -nonewline "Cleanup: may take some time... "}
     flush stdout
-    # catch {exec rm -rf {*}[glob tests/tmp/redis.conf.*]}
-    # catch {exec rm -rf {*}[glob tests/tmp/server.*]}
+    catch {exec rm -rf {*}[glob tests/tmp/redis.conf.*]}
+    catch {exec rm -rf {*}[glob tests/tmp/server.*]}
     if {!$::quiet} {puts "OK"}
 }
 
@@ -318,15 +291,14 @@ proc show_clients_state {} {
 
 proc kill_clients {} {
     foreach p $::clients_pids {
-         catch {exec kill $p}
+        catch {exec kill $p}
     }
 }
 
 proc force_kill_all_servers {} {
     foreach p $::active_servers {
         puts "Killing still running Redis server $p"
-        flush stdout
-        # catch {exec kill -9 $p}
+        catch {exec kill -9 $p}
     }
 }
 

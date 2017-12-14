@@ -232,9 +232,11 @@ start_server {tags {"other"}} {
         set aux {}
         r select 9
         r flushdb
+	LoadFromLdbIfConfig r
         lappend aux [r dbsize]
         r select 10
         r flushdb
+	LoadFromLdbIfConfig r
         lappend aux [r dbsize]
     } {0 0}
 
