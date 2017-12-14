@@ -180,6 +180,7 @@ typedef long long mstime_t; /* millisecond time type. */
 #define REDIS_CMD_SKIP_MONITOR 2048         /* "M" flag */
 #define REDIS_CMD_ASKING 4096               /* "k" flag */
 #define REDIS_CMD_FAST 8192                 /* "F" flag */
+#define REDIS_CMD_FORBID_LEVELDB   1 << 31      /* "f" flag */
 
 /* Object types */
 #define REDIS_STRING 0
@@ -1187,6 +1188,7 @@ void updateDictResizePolicy(void);
 int htNeedsResize(dict *dict);
 void oom(const char *msg);
 void populateCommandTable(void);
+void populateCommandTableForleveldb(void);
 void resetCommandTableStats(void);
 void adjustOpenFilesLimit(void);
 void closeListeningSockets(int unlink_unix_socket);
