@@ -1,3 +1,3 @@
-#define REDIS_GIT_SHA1 "be7a288f"
-#define REDIS_GIT_DIRTY "13"
-#define REDIS_BUILD_ID "master-1437992148"
+#define REDIS_GIT_SHA1 "d064ed9a"
+#define REDIS_GIT_DIRTY "439"
+#define REDIS_BUILD_ID "10.18.97.222-1514443820"

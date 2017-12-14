@@ -306,4 +306,15 @@ start_server {tags {"multi"}} {
         }
         close_replication_stream $repl
     }
+    test {EXEC fails if there are forbidden cmd in queueing commands} {
+        if {[string equal yes [lindex [r config get leveldb] 1]]} {
+            r del foo1 foo2 foo3
+            r multi
+            r set foo1 bar1
+            catch {r setex foo3 10 bar2}
+            r set foo2 bar2
+            catch {r exec} e
+            assert_match {EXECABORT*} $e
+        }
+    }
 }

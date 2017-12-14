@@ -1,7 +1,37 @@
 set ::global_overrides {}
 set ::tags {}
 set ::valgrind_errors {}
-
+proc set_denycmd {} {
+    set ::denycmd {}
+    lappend ::denycmd "SETEX"
+    lappend ::denycmd "EXPIRE"
+    lappend ::denycmd "EXPIREAT"
+    lappend ::denycmd "MIGRATE"
+    lappend ::denycmd "MOVE"
+    lappend ::denycmd "PERSIST"
+    lappend ::denycmd "PEXPIRE"
+    lappend ::denycmd "PEXPIREAT"
+    lappend ::denycmd "PTTL"
+    lappend ::denycmd "RENAME"
+    lappend ::denycmd "RENAMENX"
+    lappend ::denycmd "RESTORE"
+    lappend ::denycmd "DUMP"
+    lappend ::denycmd "TTL"
+    lappend ::denycmd "PSETEX"
+    lappend ::denycmd "SETEX"
+    lappend ::denycmd "SDIFFSTORE"
+    lappend ::denycmd "SINTERSTORE"
+    lappend ::denycmd "SMOVE"
+    lappend ::denycmd "SPOP"
+    lappend ::denycmd "SUNIONSTORE"
+    lappend ::denycmd "ZUNIONSTORE"
+    lappend ::denycmd "ZINTERSTORE"
+    lappend ::denycmd "AOF"
+    lappend ::denycmd "BGREWRITEAOF"
+    lappend ::denycmd "MULTI"
+    lappend ::denycmd "EXEC"
+    lappend ::denycmd "WATCH"
+}
 proc start_server_error {config_file error} {
     set err {}
     append err "Cant' start the Redis server\n"
@@ -179,6 +209,9 @@ proc start_server {options {code undefined}} {
             set directive [lrange $elements 0 0]
             set arguments [lrange $elements 1 end]
             dict set config $directive $arguments
+            if {[string equal $directive  "leveldb"] && [string equal "yes" $arguments]} {
+                set_denycmd
+            }
         }
     }
 

@@ -15,6 +15,7 @@ start_server {
         assert_equal 1 [r sadd myset bar]
         assert_equal 0 [r sadd myset bar]
         assert_equal 2 [r scard myset]
+        LoadFromLdbIfConfig r
         assert_equal 1 [r sismember myset foo]
         assert_equal 1 [r sismember myset bar]
         assert_equal 0 [r sismember myset bla]

@@ -12,44 +12,55 @@ source tests/support/test.tcl
 source tests/support/util.tcl
 
 set ::all_tests {
-    unit/printver
-    unit/auth
-    unit/protocol
-    unit/basic
-    unit/scan
-    unit/type/list
-    unit/type/list-2
-    unit/type/list-3
-    unit/type/set
-    unit/type/zset
-    unit/type/hash
-    unit/sort
-    unit/expire
-    unit/other
-    unit/multi
-    unit/quit
-    unit/aofrw
-    integration/replication
-    integration/replication-2
-    integration/replication-3
-    integration/replication-4
-    integration/replication-psync
-    integration/aof
-    integration/rdb
-    integration/convert-zipmap-hash-on-load
-    unit/pubsub
-    unit/slowlog
-    unit/scripting
-    unit/maxmemory
-    unit/introspection
-    unit/limits
-    unit/obuf-limits
-    unit/dump
-    unit/bitops
-    unit/memefficiency
-    unit/hyperloglog
+  unit/printver
+  unit/auth
+  unit/protocol
+  unit/basic
+  unit/type/list
+  unit/type/list-2
+  unit/type/list-3
+  unit/type/set
+  unit/type/zset
+  unit/type/hash
+  unit/other
+  unit/quit
+  unit/pubsub
+  unit/slowlog
+  unit/maxmemory
+  unit/introspection
+  unit/limits
+  unit/obuf-limits
+  unit/bitops
+  unit/hyperloglog
 }
-# Index to the next test to run in the ::all_tests list.
+
+#set ::all_tests {
+#  unit/printver
+#  unit/auth
+#  unit/protocol
+#  unit/basic
+#  unit/type/list
+#  unit/type/list-2
+#  unit/type/list-3
+#  unit/type/set
+#  unit/type/zset
+#  unit/type/hash
+#  unit/other
+#  unit/multi
+#  unit/quit
+#  unit/pubsub
+#  unit/slowlog
+#  unit/maxmemory
+#  unit/introspection
+#  unit/limits
+#  unit/obuf-limits
+#  unit/bitops
+#  unit/memefficiency  ;#跳不出来了
+#  unit/hyperloglog
+#}
+
+
+#Index to the next test to run in the ::all_tests list.
 set ::next_test 0
 
 set ::host 127.0.0.1
@@ -69,7 +80,14 @@ set ::timeout 600; # 10 minutes without progresses will quit the test.
 set ::last_progress [clock seconds]
 set ::active_servers {} ; # Pids of active Redis instances.
 set ::denycmd {}  ;#forbidden command
+set ::denyfile {} ;#forbidden test file
 
+
+#proc set_denytags{} {
+#    lappend ::denytags "expire"
+#}
+
+#lappend ::denytags "expire"
 # Set to 1 when we are running in client mode. The Redis test uses a
 # server-client model to run tests simultaneously. The server instance
 # runs the specified number of client instances that will actually run tests.
@@ -164,8 +182,8 @@ proc s {args} {
 proc cleanup {} {
     if {!$::quiet} {puts -nonewline "Cleanup: may take some time... "}
     flush stdout
-    catch {exec rm -rf {*}[glob tests/tmp/redis.conf.*]}
-    catch {exec rm -rf {*}[glob tests/tmp/server.*]}
+    # catch {exec rm -rf {*}[glob tests/tmp/redis.conf.*]}
+    # catch {exec rm -rf {*}[glob tests/tmp/server.*]}
     if {!$::quiet} {puts "OK"}
 }
 
@@ -300,14 +318,15 @@ proc show_clients_state {} {
 
 proc kill_clients {} {
     foreach p $::clients_pids {
-        catch {exec kill $p}
+         catch {exec kill $p}
     }
 }
 
 proc force_kill_all_servers {} {
     foreach p $::active_servers {
         puts "Killing still running Redis server $p"
-        catch {exec kill -9 $p}
+        flush stdout
+        # catch {exec kill -9 $p}
     }
 }
 
@@ -370,6 +389,7 @@ proc test_client_main server_port {
     while 1 {
         set bytes [gets $::test_server_fd]
         set payload [read $::test_server_fd $bytes]
+        #puts $payload ;#run unit/expire
         foreach {cmd data} $payload break
         if {$cmd eq {run}} {
             execute_tests $data
@@ -402,6 +422,8 @@ proc print_help_screen {} {
 
 # parse arguments
 for {set j 0} {$j < [llength $argv]} {incr j} {
+    #puts [llength $argv]  ;#4
+    #puts $argv  ;#--client 11111 --port 21351
     set opt [lindex $argv $j]
     set arg [lindex $argv [expr $j+1]]
     if {$opt eq {--tags}} {
@@ -522,6 +544,7 @@ proc is_a_slow_computer {} {
 
 if {$::client} {
     if {[catch { test_client_main $::test_server_port } err]} {
+        #puts $err ;#bad argument "": should be "nonewline"
         set estr "Executing test client: $err.\n$::errorInfo"
         if {[catch {send_data_packet $::test_server_fd exception $estr}]} {
             puts $estr

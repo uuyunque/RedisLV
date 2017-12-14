@@ -274,6 +274,19 @@ void debugCommand(redisClient *c) {
         }
         redisLog(REDIS_WARNING,"DB reloaded by DEBUG RELOAD");
         addReply(c,shared.ok);
+    } else if (!strcasecmp(c->argv[1]->ptr,"leveldb")) {   //后台控制从leveldb加载
+        if (server.leveldb_state != REDIS_LEVELDB_ON) {
+            addReplyError(c,"redis not use leveldb to store data");
+            return;
+        }
+        closeleveldb(&server.ldb);
+        emptyDb(NULL);
+        if (loadleveldb(server.leveldb_path) != REDIS_OK) {
+            addReplyError(c,"Error trying to load from leveldb");
+            return;
+        }
+        redisLog(REDIS_WARNING,"DB reloaded by DEBUG leveldb");
+        addReply(c,shared.ok);
     } else if (!strcasecmp(c->argv[1]->ptr,"loadaof")) {
         emptyDb(NULL);
         if (loadAppendOnlyFile(server.aof_filename) != REDIS_OK) {

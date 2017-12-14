@@ -74,7 +74,28 @@ proc test {name code {okpattern undefined}} {
             return
         }
     }
+    foreach cmd $::denycmd {
+        if {[string last $cmd $name] != -1} {
+            #puts "denycmd:name return"
+            #puts $cmd
+            #puts $name
+            return
+        }
+    }
 
+    # r xxx中有禁止的命令
+    foreach cmd $::denycmd {
+        set lower_cmd [string tolower $cmd]
+        set fields [split $code "\r\n"]
+        foreach arr $fields {
+            if {[string last $lower_cmd $arr] != -1} {
+                #puts "contain denycmd return name:cmd"
+                #puts $name
+                #puts $lower_cmd
+                return
+            }
+        }
+    }
     # check if tagged with at least 1 tag to allow when there *is* a list
     # of tags to allow, because default policy is to run everything
     if {[llength $::allowtags] > 0} {
