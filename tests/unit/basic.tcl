@@ -1,6 +1,7 @@
 start_server {tags {"basic"}} {
     test {DEL all keys to start with a clean DB} {
         foreach key [r keys *] {r del $key}
+	LoadFromLdbIfConfig r
         r dbsize
     } {0}
 
@@ -38,11 +39,13 @@ start_server {tags {"basic"}} {
     } {foo_a foo_b foo_c key_x key_y key_z}
 
     test {DBSIZE} {
+	LoadFromLdbIfConfig r
         r dbsize
     } {6}
 
     test {DEL all keys} {
         foreach key [r keys *] {r del $key}
+	LoadFromLdbIfConfig r
         r dbsize
     } {0}
 
@@ -91,6 +94,7 @@ start_server {tags {"basic"}} {
         } {}
 
         test {DBSIZE should be 10101 now} {
+	    LoadFromLdbIfConfig r
             r dbsize
         } {10101}
     }
@@ -373,6 +377,7 @@ start_server {tags {"basic"}} {
         foreach key [r keys *] {
             r del $key
         }
+	LoadFromLdbIfConfig r
         r dbsize
     } {0}
 
@@ -381,6 +386,7 @@ start_server {tags {"basic"}} {
         foreach key [r keys *] {
             r del $key
         }
+	LoadFromLdbIfConfig r
         set res [r dbsize]
         r select 9
         format $res
@@ -389,10 +395,12 @@ start_server {tags {"basic"}} {
     test {MOVE basic usage} {
         r set mykey foobar
         r move mykey 10
+	LoadFromLdbIfConfig r
         set res {}
         lappend res [r exists mykey]
         lappend res [r dbsize]
         r select 10
+	LoadFromLdbIfConfig r
         lappend res [r get mykey]
         lappend res [r dbsize]
         r select 9

@@ -18,119 +18,119 @@ redis-cli backup dir(备份文件目录)
 ```
 * 当备份目录中包含BACKUP.log文件并且文件中有SUCCESS字段，表示备份成功
 
-### Redis命令支持状况(yes: 支持; no: 不支持)
+### Redis命令支持状况(yes: 支持; no: 不支持), 当redis使用leveldb引擎时，命令支持状况(yes: 支持; no: 不支持)
 
-| Key         |     |
-|-------------|-----|
-| DEL         | yes |
-| DUMP        | yes |
-| EXISTS      | yes |
-| EXPIRE      | no  |
-| EXPIREAT    | no  |
-| KEYS        | yes |
-| MIGRATE     | no  |
-| MOVE        | no  |
-| OBJECT      | yes |
-| PERSIST     | no  |
-| PEXPIRE     | no  |
-| PEXPIREAT   | no  |
-| PTTL        | no  |
-| RANDOMKEY   | yes |
-| RENAME      | no  |
-| RENAMENX    | no  |
-| RESTORE     | no  |
-| SORT        | yes |
-| TTL         | no  |
-| TYPE        | yes |
-| SCAN        | yes |
-
----
-
-| String      |     |
-|-------------|-----|
-| APPEND      | yes | 
-| BITCOUNT    | yes |
-| BITOP       | yes |
-| DECR        | yes |
-| DECRBY      | yes |
-| GET					| yes |
-| GETBIT      | yes |
-| GETRANGE    | yes |
-| GETSET      | yes |
-| INCR        | yes |
-| INCRBY      | yes |
-| INCRBYFLOAT | yes |
-| MGET        | yes |
-| MSET        | yes |
-| MSETNX      | yes |
-| PSETEX      | no  |
-| SET         | yes |
-| SETBIT      | yes |
-| SETEX       | no  |
-| SETNX       | yes |
-| SETRANGE    | yes |
-| STRLEN      | yes |
+| Key         |  redis_in_ldb  | redis_no_ldb |
+|-------------|----------------| -------------|
+| DEL         |       yes      |      yes     |
+| DUMP        |       yes      |      yes     |
+| EXISTS      |       yes      |      yes     |
+| EXPIRE      |       no       |      yes     |
+| EXPIREAT    |       no       |      yes     |
+| KEYS        |       yes      |      yes     |
+| MIGRATE     |       no       |      yes     |
+| MOVE        |       no       |      yes     |
+| OBJECT      |       yes      |      yes     |
+| PERSIST     |       no       |      yes     |
+| PEXPIRE     |       no       |      yes     |
+| PEXPIREAT   |       no       |      yes     |
+| PTTL        |       no       |      yes     |
+| RANDOMKEY   |       yes      |      yes     |
+| RENAME      |       no       |      yes     |
+| RENAMENX    |       no       |      yes     |
+| RESTORE     |       no       |      yes     |
+| SORT        |  yes(not store)|      yes     |
+| TTL         |       no       |      yes     |
+| TYPE        |       yes      |      yes     |
+| SCAN        |       yes      |      yes     |
 
 ---
 
-| Hash        |     |
-|-------------|-----|
-| HDEL        | yes | 
-| HEXISTS     | yes |
-| HGET        | yes |
-| HGETALL     | yes |
-| HINCRBY     | yes |
-| HINCRBYFLOAT| yes |
-| HKEYS       | yes |
-| HLEN        | yes |
-| HMGET       | yes |
-| HMSET       | yes |
-| HSET        | yes |
-| HSETNX      | yes |
-| HVALS       | yes |
-| HSCAN       | yes |
+| String      |  redis_in_ldb  | redis_no_ldb |
+|-------------|----------------|--------------|
+| APPEND      |       yes      |      yes     |
+| BITCOUNT    |       yes      |      yes     |
+| BITOP       |       yes      |      yes     |
+| DECR        |       yes      |      yes     |
+| DECRBY      |       yes      |      yes     |
+| GET	      |       yes      |      yes     |
+| GETBIT      |       yes      |      yes     |
+| GETRANGE    |       yes      |      yes     |
+| GETSET      |       yes      |      yes     |
+| INCR        |       yes      |      yes     |
+| INCRBY      |       yes      |      yes     |
+| INCRBYFLOAT |       yes      |      yes     |
+| MGET        |       yes      |      yes     |
+| MSET        |       yes      |      yes     |
+| MSETNX      |       yes      |      yes     |
+| PSETEX      |       no       |      yes     |
+| SET         |       yes      |      yes     |
+| SETBIT      |       yes      |      yes     |
+| SETEX       |       no       |      yes     |
+| SETNX       |       yes      |      yes     |
+| SETRANGE    |       yes      |      yes     |
+| STRLEN      |       yes      |      yes     |
 
 ---
 
-| Set         |     |
-|-------------|-----|
-| SADD        | yes |
-| SCARD       | yes |
-| SDIFF       | yes |
-| SDIFFSTORE  | no  |
-| SINTER      | yes |
-| SINTERSTORE | no  |
-| SISMEMBERS  | yes |
-| SMEMBERS    | yes |
-| SMOVE       | no  |
-| SPOP        | no  |
-| SRANDMEMBER | yes |
-| SREM        | yes |
-| SUNION      | yes |
-| SUNIONSTORE | no  |
-| SSCAN       | yes |
+| Hash        |   redis_in_ldb | redis_no_ldb |
+|-------------|----------------|--------------|
+| HDEL        |       yes      |      yes     | 
+| HEXISTS     |       yes      |      yes     |
+| HGET        |       yes      |      yes     |
+| HGETALL     |       yes      |      yes     |
+| HINCRBY     |       yes      |      yes     |
+| HINCRBYFLOAT|       yes      |      yes     |
+| HKEYS       |       yes      |      yes     |
+| HLEN        |       yes      |      yes     |
+| HMGET       |       yes      |      yes     |
+| HMSET       |       yes      |      yes     |
+| HSET        |       yes      |      yes     |
+| HSETNX      |       yes      |      yes     |
+| HVALS       |       yes      |      yes     |
+| HSCAN       |       yes      |      yes     |
 
 ---
 
-| SortedSet       |     |
-|-----------------|-----|
-| ZADD            | yes |
-| ZCARD           | yes |
-| ZCOUNT          | yes |
-| ZINCRBY         | yes |
-| ZRANGE          | yes |
-| ZRANGEBYSCORE   | yes |
-| ZRANK           | yes |
-| ZREM            | yes |
-| ZREMRANGEBYRANK | yes |  
-| ZREMRANGEBYSCORE| yes |
-| ZREVRANGE       | yes |
-| ZREVRANKBYSCORE | yes |
-| ZREVRANK        | yes |
-| ZSCORE          | yes |
-| ZUNIONSTORE     | no  |
-| ZINTERSTORE     | no  |
-| ZSCAN           | yes |
-| ZRANGEBYLEX     | yes |
-| ZLEXCOUNT       | yes |
-| ZREMRANGEBYLEX  | yes |  
+| Set         |   redis_in_ldb | redis_no_ldb |
+|-------------|----------------|--------------|
+| SADD        |       yes      |      yes     |
+| SCARD       |       yes      |      yes     |
+| SDIFF       |       yes      |      yes     |
+| SDIFFSTORE  |       no       |      yes     |
+| SINTER      |       yes      |      yes     |
+| SINTERSTORE |       no       |      yes     |
+| SISMEMBERS  |       yes      |      yes     |
+| SMEMBERS    |       yes      |      yes     |
+| SMOVE       |       no       |      yes     |
+| SPOP        |       no       |      yes     |
+| SRANDMEMBER |       yes      |      yes     |
+| SREM        |       yes      |      yes     |
+| SUNION      |       yes      |      yes     |
+| SUNIONSTORE |       no       |      yes     |
+| SSCAN       |       yes      |      yes     |
+
+---
+
+| SortedSet       | redis_in_ldb | redis_no_ldb |
+|-----------------|--------------|--------------|
+| ZADD            |       yes    |      yes     |
+| ZCARD           |       yes    |      yes     |
+| ZCOUNT          |       yes    |      yes     |
+| ZINCRBY         |       yes    |      yes     |
+| ZRANGE          |       yes    |      yes     |
+| ZRANGEBYSCORE   |       yes    |      yes     |
+| ZRANK           |       yes    |      yes     |
+| ZREM            |       yes    |      yes     |
+| ZREMRANGEBYRANK |       yes    |      yes     |  
+| ZREMRANGEBYSCORE|       yes    |      yes     |
+| ZREVRANGE       |       yes    |      yes     |
+| ZREVRANKBYSCORE |       yes    |      yes     |
+| ZREVRANK        |       yes    |      yes     |
+| ZSCORE          |       yes    |      yes     |
+| ZUNIONSTORE     |       no     |      yes     |
+| ZINTERSTORE     |       no     |      yes     |
+| ZSCAN           |       yes    |      yes     |
+| ZRANGEBYLEX     |       yes    |      yes     |
+| ZLEXCOUNT       |       yes    |      yes     |
+| ZREMRANGEBYLEX  |       yes    |      yes     |  

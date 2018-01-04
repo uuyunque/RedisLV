@@ -121,8 +121,8 @@ struct redisCommand redisCommandTable[] = {
     {"get",getCommand,2,"rF",0,NULL,1,1,1,0,0},
     {"set",setCommand,-3,"wm",0,NULL,1,1,1,0,0},
     {"setnx",setnxCommand,3,"wmF",0,NULL,1,1,1,0,0},
-    {"setex",setexCommand,4,"wm",0,NULL,1,1,1,0,0},
-    {"psetex",psetexCommand,4,"wm",0,NULL,1,1,1,0,0},
+    {"setex",setexCommand,4,"wmf",0,NULL,1,1,1,0,0},
+    {"psetex",psetexCommand,4,"wmf",0,NULL,1,1,1,0,0},
     {"append",appendCommand,3,"wm",0,NULL,1,1,1,0,0},
     {"strlen",strlenCommand,2,"rF",0,NULL,1,1,1,0,0},
     {"del",delCommand,-2,"w",0,NULL,1,-1,1,0,0},
@@ -154,17 +154,17 @@ struct redisCommand redisCommandTable[] = {
     {"rpoplpush",rpoplpushCommand,3,"wm",0,NULL,1,2,1,0,0},
     {"sadd",saddCommand,-3,"wmF",0,NULL,1,1,1,0,0},
     {"srem",sremCommand,-3,"wF",0,NULL,1,1,1,0,0},
-    {"smove",smoveCommand,4,"wF",0,NULL,1,2,1,0,0},
+    {"smove",smoveCommand,4,"wFf",0,NULL,1,2,1,0,0},
     {"sismember",sismemberCommand,3,"rF",0,NULL,1,1,1,0,0},
     {"scard",scardCommand,2,"rF",0,NULL,1,1,1,0,0},
-    {"spop",spopCommand,2,"wRsF",0,NULL,1,1,1,0,0},
+    {"spop",spopCommand,2,"wRsFf",0,NULL,1,1,1,0,0},
     {"srandmember",srandmemberCommand,-2,"rR",0,NULL,1,1,1,0,0},
     {"sinter",sinterCommand,-2,"rS",0,NULL,1,-1,1,0,0},
     {"sinterstore",sinterstoreCommand,-3,"wm",0,NULL,1,-1,1,0,0},
     {"sunion",sunionCommand,-2,"rS",0,NULL,1,-1,1,0,0},
-    {"sunionstore",sunionstoreCommand,-3,"wm",0,NULL,1,-1,1,0,0},
+    {"sunionstore",sunionstoreCommand,-3,"wmf",0,NULL,1,-1,1,0,0},
     {"sdiff",sdiffCommand,-2,"rS",0,NULL,1,-1,1,0,0},
-    {"sdiffstore",sdiffstoreCommand,-3,"wm",0,NULL,1,-1,1,0,0},
+    {"sdiffstore",sdiffstoreCommand,-3,"wmf",0,NULL,1,-1,1,0,0},
     {"smembers",sinterCommand,2,"rS",0,NULL,1,1,1,0,0},
     {"sscan",sscanCommand,-3,"rR",0,NULL,1,1,1,0,0},
     {"zadd",zaddCommand,-4,"wmF",0,NULL,1,1,1,0,0},
@@ -173,8 +173,8 @@ struct redisCommand redisCommandTable[] = {
     {"zremrangebyscore",zremrangebyscoreCommand,4,"w",0,NULL,1,1,1,0,0},
     {"zremrangebyrank",zremrangebyrankCommand,4,"w",0,NULL,1,1,1,0,0},
     {"zremrangebylex",zremrangebylexCommand,4,"w",0,NULL,1,1,1,0,0},
-    {"zunionstore",zunionstoreCommand,-4,"wm",0,zunionInterGetKeys,0,0,0,0,0},
-    {"zinterstore",zinterstoreCommand,-4,"wm",0,zunionInterGetKeys,0,0,0,0,0},
+    {"zunionstore",zunionstoreCommand,-4,"wmf",0,zunionInterGetKeys,0,0,0,0,0},
+    {"zinterstore",zinterstoreCommand,-4,"wmf",0,zunionInterGetKeys,0,0,0,0,0},
     {"zrange",zrangeCommand,-4,"r",0,NULL,1,1,1,0,0},
     {"zrangebyscore",zrangebyscoreCommand,-4,"r",0,NULL,1,1,1,0,0},
     {"zrevrangebyscore",zrevrangebyscoreCommand,-4,"r",0,NULL,1,1,1,0,0},
@@ -210,13 +210,13 @@ struct redisCommand redisCommandTable[] = {
     {"msetnx",msetnxCommand,-3,"wm",0,NULL,1,-1,2,0,0},
     {"randomkey",randomkeyCommand,1,"rR",0,NULL,0,0,0,0,0},
     {"select",selectCommand,2,"rlF",0,NULL,0,0,0,0,0},
-    {"move",moveCommand,3,"wF",0,NULL,1,1,1,0,0},
-    {"rename",renameCommand,3,"w",0,NULL,1,2,1,0,0},
-    {"renamenx",renamenxCommand,3,"wF",0,NULL,1,2,1,0,0},
-    {"expire",expireCommand,3,"wF",0,NULL,1,1,1,0,0},
-    {"expireat",expireatCommand,3,"wF",0,NULL,1,1,1,0,0},
-    {"pexpire",pexpireCommand,3,"wF",0,NULL,1,1,1,0,0},
-    {"pexpireat",pexpireatCommand,3,"wF",0,NULL,1,1,1,0,0},
+    {"move",moveCommand,3,"wFf",0,NULL,1,1,1,0,0},
+    {"rename",renameCommand,3,"wf",0,NULL,1,2,1,0,0},
+    {"renamenx",renamenxCommand,3,"wFf",0,NULL,1,2,1,0,0},
+    {"expire",expireCommand,3,"wFf",0,NULL,1,1,1,0,0},
+    {"expireat",expireatCommand,3,"wFf",0,NULL,1,1,1,0,0},
+    {"pexpire",pexpireCommand,3,"wFf",0,NULL,1,1,1,0,0},
+    {"pexpireat",pexpireatCommand,3,"wFf",0,NULL,1,1,1,0,0},
     {"keys",keysCommand,2,"rS",0,NULL,0,0,0,0,0},
     {"scan",scanCommand,-2,"rR",0,NULL,0,0,0,0,0},
     {"dbsize",dbsizeCommand,1,"rF",0,NULL,0,0,0,0,0},
@@ -240,9 +240,9 @@ struct redisCommand redisCommandTable[] = {
     {"sort",sortCommand,-2,"wm",0,NULL,1,1,1,0,0},
     {"info",infoCommand,-1,"rlt",0,NULL,0,0,0,0,0},
     {"monitor",monitorCommand,1,"ars",0,NULL,0,0,0,0,0},
-    {"ttl",ttlCommand,2,"rF",0,NULL,1,1,1,0,0},
-    {"pttl",pttlCommand,2,"rF",0,NULL,1,1,1,0,0},
-    {"persist",persistCommand,2,"wF",0,NULL,1,1,1,0,0},
+    {"ttl",ttlCommand,2,"rFf",0,NULL,1,1,1,0,0},
+    {"pttl",pttlCommand,2,"rFf",0,NULL,1,1,1,0,0},
+    {"persist",persistCommand,2,"wFf",0,NULL,1,1,1,0,0},
     {"slaveof",slaveofCommand,3,"ast",0,NULL,0,0,0,0,0},
     {"role",roleCommand,1,"lst",0,NULL,0,0,0,0,0},
     {"debug",debugCommand,-2,"as",0,NULL,0,0,0,0,0},
@@ -255,8 +255,8 @@ struct redisCommand redisCommandTable[] = {
     {"pubsub",pubsubCommand,-2,"pltrR",0,NULL,0,0,0,0,0},
     {"watch",watchCommand,-2,"rsF",0,NULL,1,-1,1,0,0},
     {"unwatch",unwatchCommand,1,"rsF",0,NULL,0,0,0,0,0},
-    {"restore",restoreCommand,4,"wm",0,NULL,1,1,1,0,0},
-    {"migrate",migrateCommand,6,"w",0,NULL,0,0,0,0,0},
+    {"restore",restoreCommand,4,"wmf",0,NULL,1,1,1,0,0},
+    {"migrate",migrateCommand,6,"wf",0,NULL,0,0,0,0,0},
     {"dump",dumpCommand,2,"r",0,NULL,1,1,1,0,0},
     {"object",objectCommand,3,"r",0,NULL,2,2,2,0,0},
     {"client",clientCommand,-2,"rs",0,NULL,0,0,0,0,0},
@@ -1832,6 +1832,7 @@ void populateCommandTable(void) {
             case 't': c->flags |= REDIS_CMD_STALE; break;
             case 'M': c->flags |= REDIS_CMD_SKIP_MONITOR; break;
             case 'F': c->flags |= REDIS_CMD_FAST; break;
+            case 'f': break;
             default: redisPanic("Unsupported command flag"); break;
             }
             f++;
@@ -1845,6 +1846,24 @@ void populateCommandTable(void) {
     }
 }
 
+//set forbiden flag after server.leveldb_state inited
+void populateCommandTableForleveldb(void) {
+    int j;
+    int numcommands = sizeof(redisCommandTable)/sizeof(struct redisCommand);
+
+    for (j = 0; j < numcommands; j++) {
+        struct redisCommand *c = redisCommandTable+j;
+        char *f = c->sflags;
+        while(*f != '\0') {
+            if ((*f) == 'f') {
+                if (server.leveldb_state == REDIS_LEVELDB_ON) {
+                    c->flags |=  REDIS_CMD_FORBID_LEVELDB;
+                }
+            }
+            f++;
+        }
+    }
+}
 void resetCommandTableStats(void) {
     int numcommands = sizeof(redisCommandTable)/sizeof(struct redisCommand);
     int j;
@@ -1975,7 +1994,12 @@ void call(redisClient *c, int flags) {
     redisOpArrayInit(&server.also_propagate);
     dirty = server.dirty;
     start = ustime();
-    c->cmd->proc(c);
+    //if true 说明是在leveldb下禁止的命令.直接回复error
+    if (c->cmd->flags & REDIS_CMD_FORBID_LEVELDB) {
+        addReplyErrorFormat(c,"command:%s invalid in leveldb", c->cmd->name);
+    } else {
+        c->cmd->proc(c);
+    }
     duration = ustime()-start;
     dirty = server.dirty-dirty;
     if (dirty < 0) dirty = 0;
@@ -2073,6 +2097,11 @@ int processCommand(redisClient *c) {
         flagTransaction(c);
         addReplyErrorFormat(c,"wrong number of arguments for '%s' command",
             c->cmd->name);
+        return REDIS_OK;
+    } else if (c->cmd->flags & REDIS_CMD_FORBID_LEVELDB ) {
+        flagTransaction(c);
+        addReplyErrorFormat(c,"forbidden command '%s' in leveldb",
+            (char*)c->argv[0]->ptr);
         return REDIS_OK;
     }
 

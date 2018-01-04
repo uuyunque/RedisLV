@@ -869,6 +869,9 @@ void leveldbZclear(int dbid, struct leveldb *ldb, robj* argv) {
 }
 
 void leveldbFlushdb(int dbid, struct leveldb* ldb) {
+  if(server.leveldb_state == REDIS_LEVELDB_OFF) {
+    return;
+  }
   char tmp[1];
   char *err = NULL;
   char *data = NULL;
@@ -890,6 +893,9 @@ void leveldbFlushdb(int dbid, struct leveldb* ldb) {
 }
 
 void leveldbFlushall(struct leveldb* ldb) {
+  if(server.leveldb_state == REDIS_LEVELDB_OFF) {
+    return;
+  }
   char *err = NULL;
   char *data = NULL;
   size_t dataLen = 0;
@@ -1134,6 +1140,9 @@ void freezedCommand(redisClient *c) {
 }
 
 void leveldbDelHash(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
+    if(server.leveldb_state == REDIS_LEVELDB_OFF) {
+        return;
+    }
     hashTypeIterator *hi;
     sds key = createleveldbHashHead(dbid, objkey->ptr);
     leveldb_writebatch_t* wb = leveldb_writebatch_create();
@@ -1184,6 +1193,9 @@ void leveldbDelHash(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
 }
 
 void leveldbDelSet(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
+    if(server.leveldb_state == REDIS_LEVELDB_OFF) {
+        return;
+    }
     setTypeIterator *si;
     robj *eleobj = NULL;
     int64_t intobj;
@@ -1220,6 +1232,9 @@ void leveldbDelSet(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
 }
 
 void leveldbDelZset(int dbid, struct leveldb *ldb, robj* objkey, robj *objval) {
+    if(server.leveldb_state == REDIS_LEVELDB_OFF) {
+        return;
+    }
     int rangelen = zsetLength(objval);
     sds key = createleveldbSortedSetHead(dbid, objkey->ptr);
     leveldb_writebatch_t* wb = leveldb_writebatch_create();

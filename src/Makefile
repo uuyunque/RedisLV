@@ -211,11 +211,14 @@ distclean: clean
 
 test: $(REDIS_SERVER_NAME) $(REDIS_CHECK_AOF_NAME)
 	@(cd ..; ./runtest)
+test_ldb: $(REDIS_SERVER_NAME) $(REDIS_CHECK_AOF_NAME)
+	@(cd ..; ./runtest_ldb)
 
 test-sentinel: $(REDIS_SENTINEL_NAME)
 	@(cd ..; ./runtest-sentinel)
 
 check: test
+check: test_ldb
 
 lcov:
 	$(MAKE) gcov

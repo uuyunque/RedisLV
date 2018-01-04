@@ -562,6 +562,7 @@ void loadServerConfig(char *filename, char *options) {
         config = sdscat(config,options);
     }
     loadServerConfigFromString(config);
+    populateCommandTableForleveldb();  //禁止leveldb引擎使用的命令
     sdsfree(config);
 }
 

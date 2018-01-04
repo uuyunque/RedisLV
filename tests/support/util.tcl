@@ -369,3 +369,10 @@ proc start_write_load {host port seconds} {
 proc stop_write_load {handle} {
     catch {exec /bin/kill -9 $handle}
 }
+
+# Load from Leveldb if config
+proc LoadFromLdbIfConfig r {
+    if {[string equal yes [lindex [r config get leveldb] 1]]} {
+        r debug leveldb
+    }
+}
