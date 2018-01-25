@@ -1,8 +1,8 @@
 #!/bin/bash
 VER=$1
-URL="http://www.canonware.com/download/jemalloc/jemalloc-${VER}.tar.bz2"
+URL="https://github.com/jemalloc/jemalloc/releases/download/${VER}/jemalloc-${VER}.tar.bz2"
 echo "Downloading $URL"
-curl $URL > /tmp/jemalloc.tar.bz2
+wget -O /tmp/jemalloc.tar.bz2 $URL
 tar xvjf /tmp/jemalloc.tar.bz2
 rm -rf jemalloc
 mv jemalloc-${VER} jemalloc
