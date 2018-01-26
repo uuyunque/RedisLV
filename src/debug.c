@@ -279,6 +279,14 @@ void debugCommand(redisClient *c) {
             addReplyError(c,"redis not use leveldb to store data");
             return;
         }
+        //清空redis cache,再从leveldb加载数据
+        printf("-------start clear redis cache----------\n");
+	server.dirty += dictSize(c->db->dict);
+	signalFlushedDb(c->db->id);
+	dictEmpty(c->db->dict,NULL);
+	dictEmpty(c->db->expires,NULL);
+	dictEmpty(c->db->freezed,NULL);
+
         closeleveldb(&server.ldb);
         emptyDb(NULL);
         if (loadleveldb(server.leveldb_path) != REDIS_OK) {

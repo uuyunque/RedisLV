@@ -144,6 +144,11 @@ proc randomKey {} {
                 {randstring 1 256 compr}
     }
 }
+proc randomKeyWithRange {min max} {
+    # Random string
+    randpath {randstring $min $max alpha} \
+            {randstring $min $max compr}
+}
 
 proc findKeyWithType {r type} {
     for {set j 0} {$j < 20} {incr j} {

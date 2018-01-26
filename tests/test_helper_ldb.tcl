@@ -15,7 +15,7 @@ set ::all_tests {
   unit/printver
   unit/auth
   unit/protocol
-  unit/basic
+  unit/basic_ldb
   unit/type/list
   unit/type/list-2
   unit/type/list-3
@@ -32,6 +32,7 @@ set ::all_tests {
   unit/obuf-limits
   unit/bitops
   unit/hyperloglog
+  unit/maxmemoryb
 }
 #Index to the next test to run in the ::all_tests list.
 set ::next_test 0
@@ -199,7 +200,7 @@ proc test_server_main {} {
 proc test_server_cron {} {
     set elapsed [expr {[clock seconds]-$::last_progress}]
 
-    if {$elapsed > $::timeout} {
+    if {$::timeout > 0 && $elapsed > $::timeout} {
         set err "\[[colorstr red TIMEOUT]\]: clients state report follows."
         puts $err
         show_clients_state

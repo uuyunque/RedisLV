@@ -1105,87 +1105,89 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
     /* Handle background operations on Redis databases. */
     databasesCron();
 
-    /* Start a scheduled AOF rewrite if this was requested by the user while
-     * a BGSAVE was in progress. */
-    if (server.rdb_child_pid == -1 && server.aof_child_pid == -1 &&
-        server.aof_rewrite_scheduled)
-    {
-        rewriteAppendOnlyFileBackground();
-    }
+    if (server.leveldb_state == REDIS_LEVELDB_OFF) {
+	/* Start a scheduled AOF rewrite if this was requested by the user while
+	 * a BGSAVE was in progress. */
+	if (server.rdb_child_pid == -1 && server.aof_child_pid == -1 &&
+	    server.aof_rewrite_scheduled)
+	{
+	    rewriteAppendOnlyFileBackground();
+	}
 
-    /* Check if a background saving or AOF rewrite in progress terminated. */
-    if (server.rdb_child_pid != -1 || server.aof_child_pid != -1) {
-        int statloc;
-        pid_t pid;
+	/* Check if a background saving or AOF rewrite in progress terminated. */
+	if (server.rdb_child_pid != -1 || server.aof_child_pid != -1) {
+	    int statloc;
+	    pid_t pid;
 
-        if ((pid = wait3(&statloc,WNOHANG,NULL)) != 0) {
-            int exitcode = WEXITSTATUS(statloc);
-            int bysignal = 0;
+	    if ((pid = wait3(&statloc,WNOHANG,NULL)) != 0) {
+	        int exitcode = WEXITSTATUS(statloc);
+	        int bysignal = 0;
 
-            if (WIFSIGNALED(statloc)) bysignal = WTERMSIG(statloc);
+	        if (WIFSIGNALED(statloc)) bysignal = WTERMSIG(statloc);
 
-            if (pid == server.rdb_child_pid) {
-                backgroundSaveDoneHandler(exitcode,bysignal);
-            } else if (pid == server.aof_child_pid) {
-                backgroundRewriteDoneHandler(exitcode,bysignal);
-            } else {
-                redisLog(REDIS_WARNING,
-                    "Warning, detected child with unmatched pid: %ld",
-                    (long)pid);
-            }
-            updateDictResizePolicy();
-        }
-    } else {
-        /* If there is not a background saving/rewrite in progress check if
-         * we have to save/rewrite now */
-         for (j = 0; j < server.saveparamslen; j++) {
-            struct saveparam *sp = server.saveparams+j;
+	        if (pid == server.rdb_child_pid) {
+	    	backgroundSaveDoneHandler(exitcode,bysignal);
+	        } else if (pid == server.aof_child_pid) {
+	    	backgroundRewriteDoneHandler(exitcode,bysignal);
+	        } else {
+	    	redisLog(REDIS_WARNING,
+	    	    "Warning, detected child with unmatched pid: %ld",
+	    	    (long)pid);
+	        }
+	        updateDictResizePolicy();
+	    }
+	} else {
+	    /* If there is not a background saving/rewrite in progress check if
+	     * we have to save/rewrite now */
+	     for (j = 0; j < server.saveparamslen; j++) {
+	        struct saveparam *sp = server.saveparams+j;
 
-            /* Save if we reached the given amount of changes,
-             * the given amount of seconds, and if the latest bgsave was
-             * successful or if, in case of an error, at least
-             * REDIS_BGSAVE_RETRY_DELAY seconds already elapsed. */
-            if (server.dirty >= sp->changes &&
-                server.unixtime-server.lastsave > sp->seconds &&
-                (server.unixtime-server.lastbgsave_try >
-                 REDIS_BGSAVE_RETRY_DELAY ||
-                 server.lastbgsave_status == REDIS_OK))
-            {
-                redisLog(REDIS_NOTICE,"%d changes in %d seconds. Saving...",
-                    sp->changes, (int)sp->seconds);
-                rdbSaveBackground(server.rdb_filename);
-                break;
-            }
-         }
+	        /* Save if we reached the given amount of changes,
+	         * the given amount of seconds, and if the latest bgsave was
+	         * successful or if, in case of an error, at least
+	         * REDIS_BGSAVE_RETRY_DELAY seconds already elapsed. */
+	        if (server.dirty >= sp->changes &&
+	    	server.unixtime-server.lastsave > sp->seconds &&
+	    	(server.unixtime-server.lastbgsave_try >
+	    	 REDIS_BGSAVE_RETRY_DELAY ||
+	    	 server.lastbgsave_status == REDIS_OK))
+	        {
+	    	redisLog(REDIS_NOTICE,"%d changes in %d seconds. Saving...",
+	    	    sp->changes, (int)sp->seconds);
+	    	rdbSaveBackground(server.rdb_filename);
+	    	break;
+	        }
+	     }
 
-         /* Trigger an AOF rewrite if needed */
-         if (server.rdb_child_pid == -1 &&
-             server.aof_child_pid == -1 &&
-             server.aof_rewrite_perc &&
-             server.aof_current_size > server.aof_rewrite_min_size)
-         {
-            long long base = server.aof_rewrite_base_size ?
-                            server.aof_rewrite_base_size : 1;
-            long long growth = (server.aof_current_size*100/base) - 100;
-            if (growth >= server.aof_rewrite_perc) {
-                redisLog(REDIS_NOTICE,"Starting automatic rewriting of AOF on %lld%% growth",growth);
-                rewriteAppendOnlyFileBackground();
-            }
-         }
-    }
+	     /* Trigger an AOF rewrite if needed */
+	     if (server.rdb_child_pid == -1 &&
+	         server.aof_child_pid == -1 &&
+	         server.aof_rewrite_perc &&
+	         server.aof_current_size > server.aof_rewrite_min_size)
+	     {
+	        long long base = server.aof_rewrite_base_size ?
+	    		    server.aof_rewrite_base_size : 1;
+	        long long growth = (server.aof_current_size*100/base) - 100;
+	        if (growth >= server.aof_rewrite_perc) {
+	    	redisLog(REDIS_NOTICE,"Starting automatic rewriting of AOF on %lld%% growth",growth);
+	    	rewriteAppendOnlyFileBackground();
+	        }
+	     }
+	}
 
 
-    /* AOF postponed flush: Try at every cron cycle if the slow fsync
-     * completed. */
-    if (server.aof_flush_postponed_start) flushAppendOnlyFile(0);
+	/* AOF postponed flush: Try at every cron cycle if the slow fsync
+	 * completed. */
+	if (server.aof_flush_postponed_start) flushAppendOnlyFile(0);
 
-    /* AOF write errors: in this case we have a buffer to flush as well and
-     * clear the AOF error in case of success to make the DB writable again,
-     * however to try every second is enough in case of 'hz' is set to
-     * an higher frequency. */
-    run_with_period(1000) {
-        if (server.aof_last_write_status == REDIS_ERR)
-            flushAppendOnlyFile(0);
+	/* AOF write errors: in this case we have a buffer to flush as well and
+	 * clear the AOF error in case of success to make the DB writable again,
+	 * however to try every second is enough in case of 'hz' is set to
+	 * an higher frequency. */
+	run_with_period(1000) {
+	    if (server.aof_last_write_status == REDIS_ERR)
+	        flushAppendOnlyFile(0);
+	}
     }
 
     /* Close clients that need to be closed asynchronous */
