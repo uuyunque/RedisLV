@@ -90,8 +90,16 @@ start_server {tags {"maxmemoryb"}} {
             }
             if {$random_val % 1000 == 0} {
                 assert_equal $veri_set_val [r get $veri_set_key]
+                assert_equal "string" [r type $veri_set_key]
+                assert_equal "set" [r type $veri_sadd_key]
+                assert_equal "hash" [r type $veri_hash_key]
+                assert_equal "zset" [r type $veri_zadd_key]
+                assert_equal 1 [r exists $veri_set_key]
+                assert_equal 1 [r hexists $veri_hash_key $veri_mem_key]
                 assert_equal 1 [r sismember $veri_sadd_key $veri_sadd_val]
                 assert_equal $veri_hash_val [r hget $veri_hash_key $veri_mem_key]
+                set random_key [r randomkey]
+                assert_equal 1 [r exists $random_key]
                 set  get_rank [r zrank $veri_zadd_key $veri_zadd_mem]
                 if {[string length $get_rank] == 0} {
 		    puts "<erro:>zrank $veri_zadd_key:$veri_zadd_mem not exist"
@@ -140,8 +148,8 @@ start_server {tags {"maxmemoryb"}} {
             }
             if {$numkeys % 100000 == 0 } {
                 set elapsed [expr {[clock seconds]-$last_progress}]
-        	puts "--------------numkeys<$numkeys> cost time<$elapsed>--------------"
                 set last_progress [clock seconds]
+        	puts "--------------numkeys<$numkeys> cost time<$elapsed> ts<$last_progress>--------------"
             }
         }
     }

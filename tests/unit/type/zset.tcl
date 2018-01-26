@@ -29,9 +29,11 @@ start_server {tags {"zset"}} {
             r zadd ztmp 10 x
             r zadd ztmp 20 y
             r zadd ztmp 30 z
+            LoadFromLdbIfConfig r
             assert_equal {x y z} [r zrange ztmp 0 -1]
 
             r zadd ztmp 1 y
+            LoadFromLdbIfConfig r
             assert_equal {y x z} [r zrange ztmp 0 -1]
         }
 
@@ -90,6 +92,7 @@ start_server {tags {"zset"}} {
             assert_equal 0 [r zrem ztmp z]
             assert_equal 1 [r zrem ztmp y]
             assert_equal 1 [r zrem ztmp x]
+            LoadFromLdbIfConfig r
             assert_equal 0 [r exists ztmp]
         }
 
@@ -99,6 +102,7 @@ start_server {tags {"zset"}} {
             assert_equal 2 [r zrem ztmp x y a b k]
             assert_equal 0 [r zrem ztmp foo bar]
             assert_equal 1 [r zrem ztmp c]
+            LoadFromLdbIfConfig r
             r exists ztmp
         } {0}
 
@@ -115,6 +119,7 @@ start_server {tags {"zset"}} {
             r zadd ztmp 3 c
             r zadd ztmp 4 d
 
+            LoadFromLdbIfConfig r
             assert_equal {a b c d} [r zrange ztmp 0 -1]
             assert_equal {a b c} [r zrange ztmp 0 -2]
             assert_equal {b c d} [r zrange ztmp 1 -1]
@@ -145,6 +150,7 @@ start_server {tags {"zset"}} {
             r zadd ztmp 3 c
             r zadd ztmp 4 d
 
+            LoadFromLdbIfConfig r
             assert_equal {d c b a} [r zrevrange ztmp 0 -1]
             assert_equal {d c b} [r zrevrange ztmp 0 -2]
             assert_equal {c b a} [r zrevrange ztmp 1 -1]
@@ -173,6 +179,7 @@ start_server {tags {"zset"}} {
             r zadd zranktmp 10 x
             r zadd zranktmp 20 y
             r zadd zranktmp 30 z
+            LoadFromLdbIfConfig r
             assert_equal 0 [r zrank zranktmp x]
             assert_equal 1 [r zrank zranktmp y]
             assert_equal 2 [r zrank zranktmp z]
@@ -185,6 +192,7 @@ start_server {tags {"zset"}} {
 
         test "ZRANK - after deletion - $encoding" {
             r zrem zranktmp y
+            LoadFromLdbIfConfig r
             assert_equal 0 [r zrank zranktmp x]
             assert_equal 1 [r zrank zranktmp z]
         }
@@ -204,6 +212,7 @@ start_server {tags {"zset"}} {
             r zincrby zset 10 bar
             r zincrby zset -5 foo
             r zincrby zset -5 bar
+            LoadFromLdbIfConfig r
             assert_equal {foo bar} [r zrange zset 0 -1]
 
             assert_equal -2 [r zscore zset foo]
@@ -218,6 +227,7 @@ start_server {tags {"zset"}} {
             create_default_zset
 
             # inclusive range
+            LoadFromLdbIfConfig r
             assert_equal {a b c} [r zrangebyscore zset -inf 2]
             assert_equal {b c d} [r zrangebyscore zset 0 3]
             assert_equal {d e f} [r zrangebyscore zset 3 6]
@@ -244,6 +254,7 @@ start_server {tags {"zset"}} {
             r zrem zset g
 
             # inclusive
+            LoadFromLdbIfConfig r
             assert_equal {} [r zrangebyscore zset 4 2]
             assert_equal {} [r zrangebyscore zset 6 +inf]
             assert_equal {} [r zrangebyscore zset -inf -6]
@@ -268,12 +279,14 @@ start_server {tags {"zset"}} {
 
         test "ZRANGEBYSCORE with WITHSCORES" {
             create_default_zset
+            LoadFromLdbIfConfig r
             assert_equal {b 1 c 2 d 3} [r zrangebyscore zset 0 3 withscores]
             assert_equal {d 3 c 2 b 1} [r zrevrangebyscore zset 3 0 withscores]
         }
 
         test "ZRANGEBYSCORE with LIMIT" {
             create_default_zset
+            LoadFromLdbIfConfig r
             assert_equal {b c}   [r zrangebyscore zset 0 10 LIMIT 0 2]
             assert_equal {d e f} [r zrangebyscore zset 0 10 LIMIT 2 3]
             assert_equal {d e f} [r zrangebyscore zset 0 10 LIMIT 2 10]
@@ -286,6 +299,7 @@ start_server {tags {"zset"}} {
 
         test "ZRANGEBYSCORE with LIMIT and WITHSCORES" {
             create_default_zset
+            LoadFromLdbIfConfig r
             assert_equal {e 4 f 5} [r zrangebyscore zset 2 5 LIMIT 2 3 WITHSCORES]
             assert_equal {d 3 c 2} [r zrevrangebyscore zset 5 2 LIMIT 2 3 WITHSCORES]
         }
@@ -306,6 +320,7 @@ start_server {tags {"zset"}} {
             create_default_lex_zset
 
             # inclusive range
+            LoadFromLdbIfConfig r
             assert_equal {alpha bar cool} [r zrangebylex zset - \[cool]
             assert_equal {bar cool down} [r zrangebylex zset \[bar \[down]
             assert_equal {great hill omega} [r zrangebylex zset \[g +]
@@ -333,6 +348,7 @@ start_server {tags {"zset"}} {
 
         test "ZRANGEBYSLEX with LIMIT" {
             create_default_lex_zset
+            LoadFromLdbIfConfig r
             assert_equal {alpha bar} [r zrangebylex zset - \[cool LIMIT 0 2]
             assert_equal {bar cool} [r zrangebylex zset - \[cool LIMIT 1 2]
             assert_equal {} [r zrangebylex zset \[bar \[down LIMIT 0 0]
@@ -361,50 +377,63 @@ start_server {tags {"zset"}} {
 
             # inner range
             assert_equal 3 [remrangebyscore 2 4]
+            LoadFromLdbIfConfig r
             assert_equal {a e} [r zrange zset 0 -1]
 
             # start underflow
             assert_equal 1 [remrangebyscore -10 1]
+            LoadFromLdbIfConfig r
             assert_equal {b c d e} [r zrange zset 0 -1]
 
             # end overflow
             assert_equal 1 [remrangebyscore 5 10]
+            LoadFromLdbIfConfig r
             assert_equal {a b c d} [r zrange zset 0 -1]
 
             # switch min and max
             assert_equal 0 [remrangebyscore 4 2]
+            LoadFromLdbIfConfig r
             assert_equal {a b c d e} [r zrange zset 0 -1]
 
             # -inf to mid
             assert_equal 3 [remrangebyscore -inf 3]
+            LoadFromLdbIfConfig r
             assert_equal {d e} [r zrange zset 0 -1]
 
             # mid to +inf
             assert_equal 3 [remrangebyscore 3 +inf]
+            LoadFromLdbIfConfig r
             assert_equal {a b} [r zrange zset 0 -1]
 
             # -inf to +inf
             assert_equal 5 [remrangebyscore -inf +inf]
+            LoadFromLdbIfConfig r
             assert_equal {} [r zrange zset 0 -1]
 
             # exclusive min
             assert_equal 4 [remrangebyscore (1 5]
+            LoadFromLdbIfConfig r
             assert_equal {a} [r zrange zset 0 -1]
             assert_equal 3 [remrangebyscore (2 5]
+            LoadFromLdbIfConfig r
             assert_equal {a b} [r zrange zset 0 -1]
 
             # exclusive max
             assert_equal 4 [remrangebyscore 1 (5]
+            LoadFromLdbIfConfig r
             assert_equal {e} [r zrange zset 0 -1]
             assert_equal 3 [remrangebyscore 1 (4]
+            LoadFromLdbIfConfig r
             assert_equal {d e} [r zrange zset 0 -1]
 
             # exclusive min and max
             assert_equal 3 [remrangebyscore (1 (5]
+            LoadFromLdbIfConfig r
             assert_equal {a e} [r zrange zset 0 -1]
 
             # destroy when empty
             assert_equal 5 [remrangebyscore 1 5]
+            LoadFromLdbIfConfig r
             assert_equal 0 [r exists zset]
         }
 
@@ -423,26 +452,32 @@ start_server {tags {"zset"}} {
 
             # inner range
             assert_equal 3 [remrangebyrank 1 3]
+            LoadFromLdbIfConfig r
             assert_equal {a e} [r zrange zset 0 -1]
 
             # start underflow
             assert_equal 1 [remrangebyrank -10 0]
+            LoadFromLdbIfConfig r
             assert_equal {b c d e} [r zrange zset 0 -1]
 
             # start overflow
             assert_equal 0 [remrangebyrank 10 -1]
+            LoadFromLdbIfConfig r
             assert_equal {a b c d e} [r zrange zset 0 -1]
 
             # end underflow
             assert_equal 0 [remrangebyrank 0 -10]
+            LoadFromLdbIfConfig r
             assert_equal {a b c d e} [r zrange zset 0 -1]
 
             # end overflow
             assert_equal 5 [remrangebyrank 0 10]
+            LoadFromLdbIfConfig r
             assert_equal {} [r zrange zset 0 -1]
 
             # destroy when empty
             assert_equal 5 [remrangebyrank 0 4]
+            LoadFromLdbIfConfig r
             assert_equal 0 [r exists zset]
         }
 

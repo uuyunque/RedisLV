@@ -28,6 +28,7 @@ start_server {
         assert_equal 1 [r sadd myset 16]
         assert_equal 0 [r sadd myset 16]
         assert_equal 2 [r scard myset]
+        LoadFromLdbIfConfig r
         assert_equal 1 [r sismember myset 16]
         assert_equal 1 [r sismember myset 17]
         assert_equal 0 [r sismember myset 18]
@@ -43,12 +44,14 @@ start_server {
         create_set myset {1 2 3}
         assert_encoding intset myset
         assert_equal 1 [r sadd myset a]
+        LoadFromLdbIfConfig r
         assert_encoding hashtable myset
     }
 
     test "SADD an integer larger than 64 bits" {
         create_set myset {213244124402402314402033402}
         assert_encoding hashtable myset
+        LoadFromLdbIfConfig r
         assert_equal 1 [r sismember myset 213244124402402314402033402]
     }
 
@@ -57,6 +60,7 @@ start_server {
         for {set i 0} {$i < 512} {incr i} { r sadd myset $i }
         assert_encoding intset myset
         assert_equal 1 [r sadd myset 512]
+        LoadFromLdbIfConfig r
         assert_encoding hashtable myset
     }
 
@@ -64,6 +68,7 @@ start_server {
         r del myset
         assert_equal 3 [r sadd myset a b c]
         assert_equal 2 [r sadd myset A a b c B]
+        LoadFromLdbIfConfig r
         assert_equal [lsort {A a b c B}] [lsort [r smembers myset]]
     }
 
@@ -87,6 +92,7 @@ start_server {
         assert_encoding hashtable myset
         assert_equal 0 [r srem myset qux]
         assert_equal 1 [r srem myset foo]
+        LoadFromLdbIfConfig r
         assert_equal {bar ciao} [lsort [r smembers myset]]
     }
 
@@ -95,6 +101,7 @@ start_server {
         assert_encoding intset myset
         assert_equal 0 [r srem myset 6]
         assert_equal 1 [r srem myset 4]
+        LoadFromLdbIfConfig r
         assert_equal {3 5} [lsort [r smembers myset]]
     }
 
@@ -103,6 +110,7 @@ start_server {
         r sadd myset a b c d
         assert_equal 0 [r srem myset k k k]
         assert_equal 2 [r srem myset b d x y]
+        LoadFromLdbIfConfig r
         lsort [r smembers myset]
     } {a c}
 

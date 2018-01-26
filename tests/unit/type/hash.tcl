@@ -1,4 +1,4 @@
-start_server {tags {"hash"}} {
+start_server {tags {"hash_ldb"}} {
     test {HSET/HLEN - Small hash creation} {
         array set smallhash {}
         for {set i 0} {$i < 8} {incr i} {
@@ -11,6 +11,7 @@ start_server {tags {"hash"}} {
             r hset smallhash $key $val
             set smallhash($key) $val
         }
+        LoadFromLdbIfConfig r
         list [r hlen smallhash]
     } {8}
 
@@ -30,6 +31,7 @@ start_server {tags {"hash"}} {
             r hset bighash $key $val
             set bighash($key) $val
         }
+        LoadFromLdbIfConfig r
         list [r hlen bighash]
     } {1024}
 
@@ -90,6 +92,7 @@ start_server {tags {"hash"}} {
 
     test {HSETNX target key exists - small hash} {
         r hsetnx smallhash __123123123__ bar
+        LoadFromLdbIfConfig r
         set result [r hget smallhash __123123123__]
         r hdel smallhash __123123123__
         set _ $result
@@ -97,11 +100,13 @@ start_server {tags {"hash"}} {
 
     test {HSETNX target key missing - big hash} {
         r hsetnx bighash __123123123__ foo
+        LoadFromLdbIfConfig r
         r hget bighash __123123123__
     } {foo}
 
     test {HSETNX target key exists - big hash} {
         r hsetnx bighash __123123123__ bar
+        LoadFromLdbIfConfig r
         set result [r hget bighash __123123123__]
         r hdel bighash __123123123__
         set _ $result
@@ -232,6 +237,7 @@ start_server {tags {"hash"}} {
         r hmset myhash a 1 b 2 c 3
         assert_equal 0 [r hdel myhash x y]
         assert_equal 2 [r hdel myhash a c f]
+        LoadFromLdbIfConfig r
         r hgetall myhash
     } {b 2}
 
@@ -239,6 +245,7 @@ start_server {tags {"hash"}} {
         r del myhash
         r hmset myhash a 1 b 2 c 3
         assert_equal 3 [r hdel myhash a b c d e]
+        LoadFromLdbIfConfig r
         assert_equal 0 [r exists myhash]
     }
 
@@ -393,6 +400,7 @@ start_server {tags {"hash"}} {
     test {Hash ziplist regression test for large keys} {
         r hset hash kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk a
         r hset hash kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk b
+        LoadFromLdbIfConfig r
         r hget hash kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk
     } {b}
 
